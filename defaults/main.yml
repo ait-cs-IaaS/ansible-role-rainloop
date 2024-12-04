@@ -1,0 +1,7 @@
+---
+rainloop_version: "1.16.0"
+rainloop_install_dir: "/var/www/rainloop"
+rainloop_url: "https://github.com/RainLoop/rainloop-webmail/releases/download/v{{ rainloop_version }}/rainloop-{{ rainloop_version }}.zip"
+rainloop_user: "www-data"
+rainloop_group: "www-data"
+rainloop_admin_password: "testtest"

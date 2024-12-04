@@ -1,0 +1,31 @@
+---
+- name: Ensure Rainloop directory exists
+  file:
+    path: "{{ rainloop_install_dir }}"
+    state: directory
+    owner: "{{ rainloop_user }}"
+    group: "{{ rainloop_group }}"
+
+- name: Download Rainloop archive
+  get_url:
+    url: "{{ rainloop_url }}"
+    dest: /tmp/rainloop.zip
+
+- name: Extract Rainloop files
+  unarchive:
+    src: /tmp/rainloop.zip
+    dest: "{{ rainloop_install_dir }}"
+    remote_src: yes
+
+- name: Set permissions on Rainloop directory
+  file:
+    path: "{{ rainloop_install_dir }}"
+    state: directory
+    owner: "{{ rainloop_user }}"
+    group: "{{ rainloop_group }}"
+    recurse: yes
+
+- name: Clean up temporary files
+  file:
+    path: /tmp/rainloop.zip
+    state: absent
