@@ -1,0 +1,4 @@
+- src: https://github.com/ait-cs-IaaS/acr-ansible-apache2.git
+  scm: git
+  version: v1.0
+  name: apache2

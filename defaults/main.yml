@@ -4,4 +4,34 @@ rainloop_install_dir: "/var/www/rainloop"
 rainloop_url: "https://github.com/RainLoop/rainloop-webmail/releases/download/v{{ rainloop_version }}/rainloop-{{ rainloop_version }}.zip"
 rainloop_user: "www-data"
 rainloop_group: "www-data"
-rainloop_admin_password: "testtest"
+
+# defaults/main.yml
+rainloop_domain: "cyberrange.com.at"
+rainloop_domain_config:
+  imap_host: "localhost"
+  imap_port: 993
+  imap_secure: "SSL"
+  imap_short_login: "Off"
+  sieve_use: "Off"
+  sieve_allow_raw: "Off"
+  sieve_host: ""
+  sieve_port: 4190
+  sieve_secure: "None"
+  smtp_host: "localhost"
+  smtp_port: 465
+  smtp_secure: "SSL"
+  smtp_short_login: "Off"
+  smtp_auth: "On"
+  smtp_php_mail: "Off"
+
+
+
+# apache2_vhosts:
+#   - name: rainloop
+#     aliases:
+#       - mail.demo.com
+#     http: true
+#     https: false
+#     document_root: "/var/www/rainloop"
+#     vhost_template: "vhost.conf.j2"
+#     enabled: true

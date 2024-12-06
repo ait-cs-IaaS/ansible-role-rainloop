@@ -1,31 +1,56 @@
 ---
 - name: Ensure Rainloop directory exists
-  file:
+  ansible.builtin.file: 
     path: "{{ rainloop_install_dir }}"
     state: directory
     owner: "{{ rainloop_user }}"
     group: "{{ rainloop_group }}"
-
-- name: Download Rainloop archive
-  get_url:
-    url: "{{ rainloop_url }}"
-    dest: /tmp/rainloop.zip
 
 - name: Extract Rainloop files
-  unarchive:
-    src: /tmp/rainloop.zip
+  ansible.builtin.unarchive:
+    src: "{{ rainloop_url }}"
     dest: "{{ rainloop_install_dir }}"
-    remote_src: yes
-
-- name: Set permissions on Rainloop directory
-  file:
-    path: "{{ rainloop_install_dir }}"
-    state: directory
     owner: "{{ rainloop_user }}"
     group: "{{ rainloop_group }}"
-    recurse: yes
+    remote_src: True
+  
+- name: Create Rainloop domain configuration
+  ansible.builtin.template:
+    src: rainloop-config.j2
+    dest: "/var/www/rainloop/data/_data_/_default_/domains/{{ rainloop_domain }}.ini"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  notify: restart apache2
 
-- name: Clean up temporary files
-  file:
-    path: /tmp/rainloop.zip
-    state: absent
+# - name: Install apache2
+#   tags: [install]
+#   ansible.builtin.include_role:
+#     name: apache2
+#   vars:
+#     apache2_vhosts:
+#       - name: rainloop
+#         aliases:
+#           - mail.
+#         http: true
+#         https: false
+#         document_root: "{{ rainloop_install_dir }}"
+#         enabled: true
+
+- name: Install apache2
+  tags: [install]
+  ansible.builtin.include_role:
+    name: apache2
+
+- name: Set Apache vhosts fact
+  ansible.builtin.set_fact:
+    apache2_vhosts:
+      - name: rainloop
+        aliases:
+          - mail.
+        http: true
+        https: false
+        document_root: "{{ rainloop_install_dir }}"
+        enabled: true
+
+
