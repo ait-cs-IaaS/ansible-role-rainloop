@@ -1,4 +1,10 @@
 ---
+- name: Install PHP and required extensions
+  ansible.builtin.package:
+    name: "{{ php_packages }}"
+    state: present
+
+
 - name: Ensure Rainloop directory exists
   ansible.builtin.file: 
     path: "{{ rainloop_install_dir }}"
@@ -13,15 +19,35 @@
     owner: "{{ rainloop_user }}"
     group: "{{ rainloop_group }}"
     remote_src: True
+
+# - name: Gather facts explicitly
+#   ansible.builtin.setup:
+
+# - name: Set a custom fact for Rainloop
+#   ansible.builtin.set_fact:
+#     rainloop_ip: "{{ ansible_default_ipv4.address }}"
+
+- name: Trigger Rainloop interface to create _data_ directory
+  ansible.builtin.uri:
+    url: "http://{{ ansible_default_ipv4.address }}"
+    status_code: 200
+    method: GET
+  register: rainloop_response
+
+# - name: Debug Rainloop HTTP response
+#   ansible.builtin.debug:
+#     var: rainloop_response
   
 - name: Create Rainloop domain configuration
   ansible.builtin.template:
     src: rainloop-config.j2
-    dest: "/var/www/rainloop/data/_data_/_default_/domains/{{ rainloop_domain }}.ini"
+    dest: "{{ rainloop_domain_config_path }}/{{ rainloop_domain }}.ini"
     owner: www-data
     group: www-data
     mode: '0644'
   notify: restart apache2
+
+
 
 # - name: Install apache2
 #   tags: [install]
@@ -42,12 +68,13 @@
   ansible.builtin.include_role:
     name: apache2
 
+
 - name: Set Apache vhosts fact
   ansible.builtin.set_fact:
     apache2_vhosts:
       - name: rainloop
         aliases:
-          - mail.
+          - mail.at
         http: true
         https: false
         document_root: "{{ rainloop_install_dir }}"
