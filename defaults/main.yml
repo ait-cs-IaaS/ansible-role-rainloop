@@ -4,9 +4,21 @@ rainloop_install_dir: "/var/www/rainloop"
 rainloop_url: "https://github.com/RainLoop/rainloop-webmail/releases/download/v{{ rainloop_version }}/rainloop-{{ rainloop_version }}.zip"
 rainloop_user: "www-data"
 rainloop_group: "www-data"
+rainloop_domain_config_path: "/var/www/rainloop/data/_data_/_default_/domains"
 
-# defaults/main.yml
-rainloop_domain: "cyberrange.com.at"
+php_packages:
+  - php
+  - php-cli
+  - php-curl
+  - php-mbstring
+  - php-xml
+  - php-zip
+  - php-json
+  - php-intl
+  - php-common
+  - libapache2-mod-php
+
+rainloop_domain: "test.com.at"
 rainloop_domain_config:
   imap_host: "localhost"
   imap_port: 993
@@ -23,6 +35,8 @@ rainloop_domain_config:
   smtp_short_login: "Off"
   smtp_auth: "On"
   smtp_php_mail: "Off"
+
+
 
 
 
