@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerName localhost
+    DocumentRoot /var/www/rainloop
+
+    <Directory "/var/www/rainloop">
+        AllowOverride All
+        Require all granted
+        Options FollowSymLinks
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/rainloop-error.log
+    CustomLog ${APACHE_LOG_DIR}/rainloop-access.log combined
+</VirtualHost>
