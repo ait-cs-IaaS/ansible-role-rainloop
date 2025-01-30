@@ -1,4 +1,5 @@
 ---
+
 - name: Install PHP and required extensions
   ansible.builtin.package:
     name: "{{ php_packages }}"
@@ -11,21 +12,35 @@
     state: directory
     owner: "{{ rainloop_user }}"
     group: "{{ rainloop_group }}"
+  become: yes
+
 
 - name: Extract Rainloop files
   ansible.builtin.unarchive:
-    src: "{{ rainloop_url }}"
+    src: "{{ rainloop_download_url }}"
     dest: "{{ rainloop_install_dir }}"
     owner: "{{ rainloop_user }}"
     group: "{{ rainloop_group }}"
     remote_src: True
 
-# - name: Gather facts explicitly
-#   ansible.builtin.setup:
 
-# - name: Set a custom fact for Rainloop
-#   ansible.builtin.set_fact:
-#     rainloop_ip: "{{ ansible_default_ipv4.address }}"
+- name: Install apache2
+  tags: [install]
+  ansible.builtin.include_role:
+    name: apache2
+  vars:
+    apache2_vhosts: "{{ rainloop_apache2_vhosts }}"
+
+- name: Flush handlers
+  meta: flush_handlers
+
+
+- name: Gather facts explicitly
+  ansible.builtin.setup:
+
+- name: Set a custom fact for Rainloop
+  ansible.builtin.set_fact:
+    rainloop_ip: "{{ ansible_default_ipv4.address }}"
 
 - name: Trigger Rainloop interface to create _data_ directory
   ansible.builtin.uri:
@@ -34,9 +49,9 @@
     method: GET
   register: rainloop_response
 
-# - name: Debug Rainloop HTTP response
-#   ansible.builtin.debug:
-#     var: rainloop_response
+- name: Debug Rainloop HTTP response
+  ansible.builtin.debug:
+    var: rainloop_response
   
 - name: Create Rainloop domain configuration
   ansible.builtin.template:
@@ -46,38 +61,3 @@
     group: www-data
     mode: '0644'
   notify: restart apache2
-
-
-
-# - name: Install apache2
-#   tags: [install]
-#   ansible.builtin.include_role:
-#     name: apache2
-#   vars:
-#     apache2_vhosts:
-#       - name: rainloop
-#         aliases:
-#           - mail.
-#         http: true
-#         https: false
-#         document_root: "{{ rainloop_install_dir }}"
-#         enabled: true
-
-- name: Install apache2
-  tags: [install]
-  ansible.builtin.include_role:
-    name: apache2
-
-
-- name: Set Apache vhosts fact
-  ansible.builtin.set_fact:
-    apache2_vhosts:
-      - name: rainloop
-        aliases:
-          - mail.at
-        http: true
-        https: false
-        document_root: "{{ rainloop_install_dir }}"
-        enabled: true
-
-
