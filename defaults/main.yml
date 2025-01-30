@@ -1,10 +1,22 @@
 ---
+rainloop_domain: "localhost"
+rainloop_url: "mail.{{ rainloop_domain }}"
 rainloop_version: "1.16.0"
 rainloop_install_dir: "/var/www/rainloop"
-rainloop_url: "https://github.com/RainLoop/rainloop-webmail/releases/download/v{{ rainloop_version }}/rainloop-{{ rainloop_version }}.zip"
+rainloop_download_url: "https://github.com/RainLoop/rainloop-webmail/releases/download/v{{ rainloop_version }}/rainloop-{{ rainloop_version }}.zip"
 rainloop_user: "www-data"
 rainloop_group: "www-data"
 rainloop_domain_config_path: "/var/www/rainloop/data/_data_/_default_/domains"
+
+
+
+rainloop_apache2_vhosts:
+  - name: "rainloop"
+    server_name: "{{ rainloop_url }}"
+    vhost_dir: false
+    vhost_template: templates/rainloop-apache-config.j2
+
+
 
 php_packages:
   - php
@@ -18,34 +30,21 @@ php_packages:
   - php-common
   - libapache2-mod-php
 
-rainloop_domain: "test.com.at"
 rainloop_domain_config:
-  imap_host: "localhost"
-  imap_port: 993
-  imap_secure: "SSL"
-  imap_short_login: "Off"
+  imap_host: "{{ rainloop_url }}"
+  imap_port: 143
+  imap_secure: "TLS"
+  imap_short_login: "On"
   sieve_use: "Off"
   sieve_allow_raw: "Off"
   sieve_host: ""
   sieve_port: 4190
   sieve_secure: "None"
-  smtp_host: "localhost"
-  smtp_port: 465
-  smtp_secure: "SSL"
-  smtp_short_login: "Off"
+  smtp_host: "{{ rainloop_url }}"
+  smtp_port: 587
+  smtp_secure: "TLS"
+  smtp_short_login: "On"
   smtp_auth: "On"
   smtp_php_mail: "Off"
 
 
-
-
-
-# apache2_vhosts:
-#   - name: rainloop
-#     aliases:
-#       - mail.demo.com
-#     http: true
-#     https: false
-#     document_root: "/var/www/rainloop"
-#     vhost_template: "vhost.conf.j2"
-#     enabled: true
